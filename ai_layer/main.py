@@ -9,6 +9,7 @@ from fastapi import (
     Query,
     Request
 )
+from fastapi.responses import JSONResponse
 
 from models.schemas import (
     NewsRequest,
@@ -70,9 +71,9 @@ async def require_internal_service_key(request: Request, call_next):
     provided_key = request.headers.get("x-internal-key", "")
 
     if not hmac.compare_digest(provided_key, INTERNAL_API_KEY):
-        raise HTTPException(
+        return JSONResponse(
             status_code=401,
-            detail="Invalid or missing internal service key"
+            content={"detail": "Invalid or missing internal service key"}
         )
 
     return await call_next(request)
